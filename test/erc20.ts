@@ -7,7 +7,7 @@ describe("ERC20", function () {
     const symbol = "TestSymbol";
 
     const erc20Factory = await ethers.getContractFactory("ERC20");
-    const erc20 = await erc20Factory.deploy(name, symbol);
+    const erc20 = await erc20Factory.deploy(name, symbol, 18);
     await erc20.deployed();
 
     expect(await erc20.name()).to.equal(name);
@@ -19,10 +19,10 @@ describe("ERC20", function () {
     const name = "TestName";
     const symbol = "TestSymbol";
 
-    const [user] = await ethers.getSigners();
+    const [user, user2] = await ethers.getSigners();
 
     const erc20Factory = await ethers.getContractFactory("ERC20");
-    const erc20 = await erc20Factory.deploy(name, symbol);
+    const erc20 = await erc20Factory.deploy(name, symbol, 18);
     await erc20.deployed();
 
     let mintBalance = ethers.utils.parseEther("1000000.0");
@@ -32,12 +32,14 @@ describe("ERC20", function () {
     await expect(erc20.mint(ethers.constants.AddressZero, mintBalance)).to.be.revertedWith('mint to the zero address');
     await erc20.mint(user.address, mintBalance);
     expect(await erc20.totalSupply()).to.equal(mintBalance);
+    await expect(erc20.connect(user2).mint(user.address, mintBalance)).to.be.revertedWith('Not owner');
 
     //burn
     await expect(erc20.burn(ethers.constants.AddressZero, mintBalance)).to.be.revertedWith('burn to the zero address');
     await expect(erc20.burn(user.address, burnBalance)).to.be.revertedWith('insufficient balance');
     await erc20.burn(user.address, mintBalance);
     expect(await erc20.totalSupply()).to.equal(0);
+    await expect(erc20.connect(user2).burn(user.address, mintBalance)).to.be.revertedWith('Not owner');
   });
 
   it("balanceOf, transfer", async function () {
@@ -47,7 +49,7 @@ describe("ERC20", function () {
     const [user, user2] = await ethers.getSigners();
 
     const erc20Factory = await ethers.getContractFactory("ERC20");
-    const erc20 = await erc20Factory.deploy(name, symbol);
+    const erc20 = await erc20Factory.deploy(name, symbol, 18);
     await erc20.deployed();
 
     let mintBalance = ethers.utils.parseEther("1.0");
@@ -67,14 +69,14 @@ describe("ERC20", function () {
     await expect(erc20.transfer(ethers.constants.AddressZero, transferAmount)).to.be.revertedWith('transfer to the zero address');
   });
 
-  it("allowance, approve, transferFrom", async function () {
+  it("allowance, approve, transferFrom, increaseAllowance, decreaseAllowance", async function () {
     const name = "TestName";
     const symbol = "TestSymbol";
 
     const [user, user2, user3] = await ethers.getSigners();
 
     const erc20Factory = await ethers.getContractFactory("ERC20");
-    const erc20 = await erc20Factory.deploy(name, symbol);
+    const erc20 = await erc20Factory.deploy(name, symbol, 18);
     await erc20.deployed();
 
     let mintBalance = ethers.utils.parseEther("1.0");
@@ -110,5 +112,15 @@ describe("ERC20", function () {
     await expect(erc20.connect(user2).transferFrom(user.address, user3.address, transferAmount))
         .to.be.revertedWith('insufficient balance sender');
 
+    await erc20.increaseAllowance(user2.address, transferAmount);
+
+    expect(await erc20.allowance(user.address, user2.address)).to.equal(transferAmount.add(transferAmount));
+
+    await erc20.decreaseAllowance(user2.address, transferAmount);
+
+    expect(await erc20.allowance(user.address, user2.address)).to.equal(transferAmount);
+
+    await expect(erc20.decreaseAllowance(user2.address, transferAmount.add(transferAmount)))
+        .to.be.revertedWith('dont have amount');
   });
 });

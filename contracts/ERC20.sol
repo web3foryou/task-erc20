@@ -8,13 +8,19 @@ contract ERC20 {
 
     uint private _totalSupply;
 
+    uint private _decimals;
+
+    address private _owner;
+
     mapping(address => uint) private _balances;
 
     mapping(address => mapping(address => uint256)) private _allowances;
 
-    constructor(string memory name_, string memory symbol_) {
+    constructor(string memory name_, string memory symbol_, uint decimals_) {
         _name = name_;
         _symbol = symbol_;
+        _decimals = decimals_;
+        _owner = msg.sender;
     }
 
     function name() public view returns (string memory){
@@ -25,8 +31,8 @@ contract ERC20 {
         return _symbol;
     }
 
-    function decimals() public pure returns (uint){
-        return 18;
+    function decimals() public view returns (uint){
+        return _decimals;
     }
 
     function totalSupply() external view returns (uint) {
@@ -49,12 +55,26 @@ contract ERC20 {
     }
 
     function approve(address spender, uint amount) external returns (bool) {
+        _approve(spender, amount);
+        return true;
+    }
+
+    function increaseAllowance(address spender, uint amount) external returns (bool) {
+        _approve(spender, _allowances[msg.sender][spender] + amount);
+        return true;
+    }
+
+    function decreaseAllowance(address spender, uint amount) external returns (bool) {
+        require(_allowances[msg.sender][spender] >= amount, "dont have amount");
+        _approve(spender, _allowances[msg.sender][spender] - amount);
+        return true;
+    }
+
+    function _approve(address spender, uint amount) private {
         require(spender != address(0), "approve to the zero address");
 
         _allowances[msg.sender][spender] = amount;
         emit Approval(msg.sender, spender, amount);
-
-        return true;
     }
 
     function transferFrom(address sender, address recipient, uint amount) external returns (bool) {
@@ -79,6 +99,7 @@ contract ERC20 {
     }
 
     function mint(address account, uint amount) public {
+        require(msg.sender == _owner, "Not owner");
         require(account != address(0), "mint to the zero address");
 
         _balances[account] += amount;
@@ -88,6 +109,7 @@ contract ERC20 {
     }
 
     function burn(address account, uint amount) external virtual {
+        require(msg.sender == _owner, "Not owner");
         require(account != address(0), "burn to the zero address");
         require(_balances[account] >= amount, "insufficient balance");
 

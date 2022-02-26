@@ -6,10 +6,8 @@ import "@nomiclabs/hardhat-waffle";
 import "@typechain/hardhat";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
-require("./tasks/mint.ts");
-require("./tasks/transfer.ts");
-require("./tasks/approve.ts");
-require("./tasks/transferFrom.ts");
+
+require("./tasks/index.ts");
 
 dotenv.config();
 
@@ -56,7 +54,10 @@ const config: HardhatUserConfig = {
     currency: "USD",
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
+    apiKey: {
+      mainnet: process.env.ETHERSCAN_API_KEY,
+      rinkeby: process.env.ETHERSCAN_API_KEY,
+    }
   },
 };
 
