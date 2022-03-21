@@ -1,12 +1,12 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
 
-describe("ERC20", function () {
+describe("ApolERC20", function () {
   it("Name, symbol, decimals", async function () {
     const name = "TestName";
     const symbol = "TestSymbol";
 
-    const erc20Factory = await ethers.getContractFactory("ERC20");
+    const erc20Factory = await ethers.getContractFactory("ApolERC20");
     const erc20 = await erc20Factory.deploy(name, symbol, 18);
     await erc20.deployed();
 
@@ -21,7 +21,7 @@ describe("ERC20", function () {
 
     const [user, user2] = await ethers.getSigners();
 
-    const erc20Factory = await ethers.getContractFactory("ERC20");
+    const erc20Factory = await ethers.getContractFactory("ApolERC20");
     const erc20 = await erc20Factory.deploy(name, symbol, 18);
     await erc20.deployed();
 
@@ -48,7 +48,7 @@ describe("ERC20", function () {
 
     const [user, user2] = await ethers.getSigners();
 
-    const erc20Factory = await ethers.getContractFactory("ERC20");
+    const erc20Factory = await ethers.getContractFactory("ApolERC20");
     const erc20 = await erc20Factory.deploy(name, symbol, 18);
     await erc20.deployed();
 
@@ -75,7 +75,7 @@ describe("ERC20", function () {
 
     const [user, user2, user3] = await ethers.getSigners();
 
-    const erc20Factory = await ethers.getContractFactory("ERC20");
+    const erc20Factory = await ethers.getContractFactory("ApolERC20");
     const erc20 = await erc20Factory.deploy(name, symbol, 18);
     await erc20.deployed();
 

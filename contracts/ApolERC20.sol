@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
-contract ERC20 {
+contract ApolERC20 {
     string private _name;
 
     string private _symbol;

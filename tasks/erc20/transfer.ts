@@ -1,13 +1,13 @@
-import { task } from "hardhat/config";
+import {task} from "hardhat/config";
 import "@nomiclabs/hardhat-waffle";
 
-task("transfer", "transfer")
+task("transferErc20", "transferErc20")
     .addParam("address", "The account address")
     .addParam("amount", "Amount")
     .setAction(async (taskArgs, hre) => {
         const CONTRACT_ERC20_ADDRESS = process.env.CONTRACT_ERC20_ADDRESS as string;
 
-        const ContractArtifact = require('./../artifacts/contracts/ERC20.sol/ERC20.json');
+        const ContractArtifact = require('../../artifacts/contracts/ApolERC20.sol/ApolERC20.json');
 
         const [signer] = await hre.ethers.getSigners();
 

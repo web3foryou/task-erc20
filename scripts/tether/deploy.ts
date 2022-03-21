@@ -15,15 +15,17 @@ async function main() {
 
   // We get the contract to deploy
 
-  const name = "TestName";
-  const symbol = "TestSymbol";
+  const name = "Tether";
+  const symbol = "USDT";
+  const decimals = 6;
+  let mintBalance = ethers.utils.parseEther("1000000.0");
 
-  const erc20Factory = await ethers.getContractFactory("ERC20");
-  const erc20 = await erc20Factory.deploy(name, symbol, 18);
+  const tetherFactory = await ethers.getContractFactory("TetherToken");
+  const tether = await tetherFactory.deploy(mintBalance, name, symbol, decimals);
 
-  await erc20.deployed();
+  await tether.deployed();
 
-  console.log("erc20 deployed to:", erc20.address);
+  console.log("tether deployed to:", tether.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

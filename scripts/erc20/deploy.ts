@@ -18,7 +18,7 @@ async function main() {
   const name = "TestName";
   const symbol = "TestSymbol";
 
-  const erc20Factory = await ethers.getContractFactory("ERC20");
+  const erc20Factory = await ethers.getContractFactory("ApolERC20");
   const erc20 = await erc20Factory.deploy(name, symbol, 18);
 
   await erc20.deployed();
