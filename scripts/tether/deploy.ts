@@ -23,7 +23,9 @@ async function main() {
   const tetherFactory = await ethers.getContractFactory("TetherToken");
   const tether = await tetherFactory.deploy(mintBalance, name, symbol, decimals);
 
+  console.log("deploy");
   await tether.deployed();
+  console.log("deployed");
 
   console.log("tether deployed to:", tether.address);
 }

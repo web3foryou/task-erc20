@@ -11,6 +11,8 @@ require("./tasks/index.ts");
 
 dotenv.config();
 
+const INFURA_KEY_RINKEBY = process.env.INFURA_KEY_RINKEBY as string;
+const INFURA_KEY_ROPSTEN = process.env.INFURA_KEY_ROPSTEN as string;
 const ALCHE_KEY_RINKEBY = process.env.ALCHE_KEY_RINKEBY as string;
 const ALCHE_KEY_ROPSTEN = process.env.ALCHE_KEY_ROPSTEN as string;
 const PK_1 = process.env.PK_1 as string;
@@ -51,13 +53,15 @@ const config: HardhatUserConfig = {
       accounts: [PKG_1, PKG_2]
     },
     rinkeby: {
-      url: "https://eth-rinkeby.alchemyapi.io/v2/" + ALCHE_KEY_RINKEBY,
+      // url: "https://eth-rinkeby.alchemyapi.io/v2/" + ALCHE_KEY_RINKEBY,
+      url: "https://rinkeby.infura.io/v3/" + INFURA_KEY_RINKEBY,
       accounts: [PK_1, PK_2],
       // gas: 2100000,
       // gasPrice: 8000000000,
     },
     ropsten: {
-      url: "https://eth-ropsten.alchemyapi.io/v2/" + ALCHE_KEY_ROPSTEN,
+      // url: "https://eth-ropsten.alchemyapi.io/v2/" + ALCHE_KEY_ROPSTEN,
+      url: "https://ropsten.infura.io/v3/" + INFURA_KEY_ROPSTEN,
       accounts: [PK_1, PK_2],
       // gas: 21000000,
       // gasPrice: 8000000000,
