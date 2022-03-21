@@ -1,7 +1,7 @@
 import {task} from "hardhat/config";
 import "@nomiclabs/hardhat-waffle";
 
-task("testCall", "testCall")
+task("getPair", "getPair")
     .setAction(async (taskArgs, hre) => {
         let contractAddress = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
 

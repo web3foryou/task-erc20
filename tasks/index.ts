@@ -6,5 +6,5 @@ require("./erc20/verify2.ts");
 
 require("./tether/transfer.ts");
 
-require("./staking/test.ts");
+require("./staking/getPair.ts");
 require("./staking/createPair.ts");

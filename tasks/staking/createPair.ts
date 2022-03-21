@@ -34,8 +34,8 @@ task("createPair", "createPair")
         //     gasPrice: 8000000000
         // });
         let data = await contractSigner.createPair(CONTRACT_ERC20_ADDRESS, CONTRACT_TETHER_ADDRESS, {
-            gasLimit: 2100000,
-            gasPrice: 8000000000
+            // gasLimit: 2100000,
+            // gasPrice: 8000000000
         });
 
         console.log(data)
