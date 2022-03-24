@@ -16,11 +16,12 @@ contract ApolERC20 {
 
     mapping(address => mapping(address => uint256)) private _allowances;
 
-    constructor(string memory name_, string memory symbol_, uint decimals_) {
+    constructor(string memory name_, string memory symbol_, uint amount, uint decimals_) {
         _name = name_;
         _symbol = symbol_;
         _decimals = decimals_;
         _owner = msg.sender;
+        mint(_owner, amount);
     }
 
     function name() public view returns (string memory){

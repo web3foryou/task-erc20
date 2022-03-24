@@ -29,16 +29,16 @@ contract Staking is AccessControl {
     }
 
     function stake(uint amount) public {
-        if (IERC20(lpToken).allowance(msg.sender, address(this)) == amount) {
-            IERC20(lpToken).transferFrom(msg.sender, address(this), amount);
+        require(IERC20(lpToken).allowance(msg.sender, address(this)) >= amount, "No amount stake");
 
-            _balances[msg.sender] += amount;
-            _timeStake[msg.sender] = block.timestamp;
-        }
+        IERC20(lpToken).transferFrom(msg.sender, address(this), amount);
+
+        _balances[msg.sender] += amount;
+        _timeStake[msg.sender] = block.timestamp;
     }
 
     function unstake() public {
-        require(_balances[msg.sender] > 0, "No amount stake");
+        require(_balances[msg.sender] > 0, "No amount unstake");
         require(_timeStake[msg.sender] + timeReward <= block.timestamp, "Time error.");
 
         uint amount = _balances[msg.sender];
@@ -58,7 +58,7 @@ contract Staking is AccessControl {
 
         _timeStake[msg.sender] = block.timestamp;
 
-        (bool success, bytes memory data) = rewardToken.call(
+        (bool success, ) = rewardToken.call(
             abi.encodeWithSignature("transfer(address,uint256)", msg.sender, amountReward)
         );
     }

@@ -15,18 +15,16 @@ async function main() {
 
   // We get the contract to deploy
 
-  // const name = "ApolERC20";
-  // const symbol = "ApolERC20";
-  const name = "Apol3";
-  const symbol = "Apol3";
+  const name = "LpToken";
+  const symbol = "LpToken";
   let mintBalance = ethers.utils.parseEther("10000000.0");
 
-  const erc20Factory = await ethers.getContractFactory("ApolERC20");
-  const erc20 = await erc20Factory.deploy(name, symbol, mintBalance, 18);
+  const lpFactory = await ethers.getContractFactory("LpToken");
+  const lp = await lpFactory.deploy(name, symbol, mintBalance);
 
-  await erc20.deployed();
+  await lp.deployed();
 
-  console.log("erc20 deployed to:", erc20.address);
+  console.log("lp deployed to:", lp.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

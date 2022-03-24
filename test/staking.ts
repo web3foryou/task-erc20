@@ -6,14 +6,15 @@ describe("Staking", function () {
     const nameLp = "LP Token";
     const symbolLp = "LP";
     const lpFactory = await ethers.getContractFactory("LpToken");
-    let mintBalance = ethers.utils.parseEther("1000000.0");
-    const lp = await lpFactory.deploy(nameLp, symbolLp, mintBalance);
+    let mintBalanceLp = ethers.utils.parseEther("1000000.0");
+    const lp = await lpFactory.deploy(nameLp, symbolLp, mintBalanceLp);
     await lp.deployed();
 
     const nameErc20 = "ERC20";
     const symbolErc20 = "ERC20";
+    let mintBalanceErc20 = ethers.utils.parseEther("0");
     const erc20Factory = await ethers.getContractFactory("ApolERC20");
-    const erc20 = await erc20Factory.deploy(nameErc20, symbolErc20, 18);
+    const erc20 = await erc20Factory.deploy(nameErc20, symbolErc20, mintBalanceErc20, 18);
     await erc20.deployed();
 
     const nameStaking = "Staking";
@@ -51,6 +52,11 @@ describe("Staking", function () {
     await staking.unstake();
     expect(await staking.balanceOf(user.address)).to.equal(0);
     expect(await lp.balanceOf(staking.address)).to.equal(0);
+    await expect(staking.unstake()).to.be.revertedWith('No amount unstake');
+
+    let stakingAmountBad = ethers.utils.parseEther("1.1");
+    await lp.approve(staking.address, stakingAmount);
+    await expect(staking.stake(stakingAmountBad)).to.be.revertedWith('No amount stake');
   });
 
   it("claim", async function () {
@@ -60,13 +66,21 @@ describe("Staking", function () {
     let stakingAmount = ethers.utils.parseEther("1.0");
     let rewardsAmount = ethers.utils.parseEther("1000.0");
     const prcReward = 20;
+
+    // клэйм без баланса
+    await expect(staking.claim()).to.be.revertedWith('Zero balance.');
+
     await lp.approve(staking.address, stakingAmount);
     await staking.stake(stakingAmount);
     await erc20.mint(staking.address, rewardsAmount);
     expect(await erc20.balanceOf(staking.address)).to.equal(rewardsAmount);
+    // клэйм раньше времени
+    await expect(staking.claim()).to.be.revertedWith('Time error.');
 
     await ethers.provider.send("evm_increaseTime", [1200]);
     await ethers.provider.send("evm_mine", []);
+
+    // улэйм успешный
     await staking.claim();
     expect(await erc20.balanceOf(user.address)).to.equal(ethers.BigNumber.from((Number(stakingAmount) * prcReward / 100).toString()));
   });
