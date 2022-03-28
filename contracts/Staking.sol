@@ -3,16 +3,17 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "hardhat/console.sol";
 
 contract Staking is AccessControl {
     string public name;
     address public lpToken;
     address public rewardToken;
-    bool public test = false;
 
     mapping(address => uint) private _balances;
     mapping(address => uint) private _timeStake;
+    mapping(address => uint) private _rewards;
 
     uint public timeReward;
     uint public prcReward;
@@ -32,6 +33,12 @@ contract Staking is AccessControl {
         require(IERC20(lpToken).allowance(msg.sender, address(this)) >= amount, "No amount stake");
 
         IERC20(lpToken).transferFrom(msg.sender, address(this), amount);
+
+        uint rewardsCount = (block.timestamp - _timeStake[msg.sender]) / timeReward;
+
+        if (rewardsCount > 0) {
+            _rewards[msg.sender] += rewardsCount * _balances[msg.sender] * prcReward / 100;
+        }
 
         _balances[msg.sender] += amount;
         _timeStake[msg.sender] = block.timestamp;
@@ -54,13 +61,14 @@ contract Staking is AccessControl {
         require(_timeStake[msg.sender] + timeReward <= block.timestamp, "Time error.");
         require(_balances[msg.sender] > 0, "Zero balance.");
 
-        uint amountReward = _balances[msg.sender] * prcReward / 100;
+        uint rewardsCount = (block.timestamp - _timeStake[msg.sender]) / timeReward;
 
-        _timeStake[msg.sender] = block.timestamp;
+        uint amountReward = _rewards[msg.sender] + rewardsCount * _balances[msg.sender] * prcReward / 100;
+        _rewards[msg.sender] = 0;
 
-        (bool success, ) = rewardToken.call(
-            abi.encodeWithSignature("transfer(address,uint256)", msg.sender, amountReward)
-        );
+        _timeStake[msg.sender] += rewardsCount * timeReward;
+
+        SafeERC20.safeTransfer(IERC20(rewardToken), msg.sender, amountReward);
     }
 
     function changeTimeReward(uint _time) public onlyMember {
@@ -72,16 +80,7 @@ contract Staking is AccessControl {
     }
 
     modifier onlyMember() {
-        require(isMember(msg.sender), "Restricted to members.");
+        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "Restricted to members.");
         _;
-    }
-
-    function isMember(address account) public virtual view returns (bool)
-    {
-        return hasRole(DEFAULT_ADMIN_ROLE, account);
-    }
-
-    function testAccess() public onlyMember {
-        test = true;
     }
 }
