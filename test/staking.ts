@@ -147,7 +147,7 @@ describe("Staking", function () {
     let totalRewards = ethers.BigNumber.from((3 * Number(stakingAmount) * prcReward / 100).toString());
     expect(await erc20.balanceOf(user.address)).to.equal(totalRewards);
 
-    // ветка со дополнительным стейком без паузы
+    // ветка со дополнительным стейком без эмуляции времени
     await lp.approve(staking.address, stakingAmount);
     await staking.stake(stakingAmount);
     await lp.approve(staking.address, stakingAmount);
